@@ -6,7 +6,7 @@ const axios = require('axios');
 const Errors = require('../Loggers/Errors');
 
 /** Auth Bearer token used for api call auth */
-const token = 'dummy-token'
+const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlByb3Rva29saU1BVEZtdWRyYWNhIiwicGFzc3dvcmQiOiJxUVp5Z0dGR2RXIn0.taYkSor4_DPd-yEonJaLyE8A5D7MTvrWKS0o-guoVpTw5MQMZupzA_wzEpfwz8uzVrQ9_6Tx3yVJXWxIlSJ7hQ'
 
 
 
