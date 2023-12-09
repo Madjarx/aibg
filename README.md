@@ -8,4 +8,8 @@
 
 ### TODOs & WIPs
 
-### What
+### Ideas
+
+- Simulacija protivnickih modula, simulation module in a worther
+- prednosti pojedinaca na pocetku
+- iskoriscavanje "bezanja" protivnika, verovatno ce neko implementirati takvu metodu

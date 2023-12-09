@@ -2,15 +2,21 @@
 const axios = require('axios');
 
 /** Module imports */
-const ErrorLogger = require('./ErrorLogger')
+// const ErrorLogger = require('../ErrorLogger')
 
 
 /**
- * Wrapper Class
+ * Conncetor Class
  * 
  * This class wraps around the AIBG api provided to us
+ * 
+ * Available methods:
+ * @method login
+ * 
+ * TODO - implement other methods for the class, take a look at the google docs
+ * 
  */
-module.exports = class APIWrapper {
+module.exports = class Connector {
 
     /**
      * Class properties
@@ -28,6 +34,7 @@ module.exports = class APIWrapper {
 
 
     /**
+     * Logins and returns the bearer token
      * 
      * @param {string} username - predefined in the env 
      * @param {string} password - predefined in the env
@@ -41,12 +48,15 @@ module.exports = class APIWrapper {
                 password: password
             });
 
-            // console.log(response)
-
             return response.data;
 
         } catch(err) {
             console.log(err)
         }
     };
+
+
+
+
+
 }

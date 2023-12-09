@@ -6,9 +6,9 @@
  * @method throwMethodNotImplemented
  * @method throwMethodNotReachable
  * 
- * # TODO: add locations for the errors to throw. It would be a smart idea to know where it popped.
+ * TODO: add locations for the errors to throw. It would be a smart idea to know where it popped.
  */
-module.exports = class ErrorLogger {
+module.exports = class Errors {
 
     /**
      * Constructor
