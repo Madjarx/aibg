@@ -22,7 +22,14 @@
 - Pretvori ovaj projekat u nesto slicno hardhat taskovima te da mozemo svoje recepte i strategije da pravimo
 - Winston logger
 - Add predefined objects/methods  as "actions" for the Connector class, as in { "move" }
-- Needs to be faut tolerant, there wont always be 4 players in the game
+
+
+- [ ] Strategy Modules - start implementing strategy & logic modules that would help us make the best move
+- [ ] Logging - implement elaborate logging that would help us with trial & error
+- [ ] Connector - validate responses in case you make an invalid move. Dont let that break our system
+- [ ] Connector - imeplemt some way of picking one of predefined actions, as in { "move" } and feed them with proper data
+- [ ] Evaluators - add evaluators
+- [ ] Favorizer - implement a favorizer that would favorize a strategy in favor of others based on evaluations
 
 ### Terminologija 
 

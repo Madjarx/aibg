@@ -62,6 +62,7 @@ module.exports = class Connector {
      * @returns 
      */
     async login(username, password) {
+        console.log("Attempting a login to " + this._apiUrl + "/user/login");
         console.log("Logging in with the credentials: ", username, password);
         try {
             const response = await axios.post(`${this._apiUrl}/user/login`, {
@@ -169,7 +170,7 @@ module.exports = class Connector {
             return null
         } catch (error) {
             console.log(error);
-            // Errors.throwMethodFailed('createGame')
+            Errors.throwMethodFailed('createGame')
         }
     };
 
