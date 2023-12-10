@@ -211,6 +211,7 @@ module.exports = class Connector {
      * Creates the game using the first bot token in the list [0]
      * 
      * Should return the initial state of the game
+
      */
     async createGame(mapName = "test1.txt") {
         try {
