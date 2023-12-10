@@ -2,7 +2,8 @@
 
 ### Short intro
 
-### Dir structure
+<img width="1168" alt="image" src="https://github.com/Madjarx/jungle-showdown-recipe-creator/assets/88193583/2e987aa4-f461-4a7d-acaf-fe160c8ac508">
+
 
 ### Usage÷ & Installation
 
