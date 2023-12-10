@@ -1,11 +1,10 @@
-const Errors = require('../Loggers/Errors')
 
 
 /**
  * This class is meant to sanitize and pick out data that we specifically need.
  * Meant to be used to help other team members get their hands on data more easily
  * 
- * Refer to ~./dump/gameState.json for more information about example data
+ * Refer to ~./data/gameState.json for more information about example data
  * 
  * NOTE - since its a hackathon, go with the assumption that everything exists!!! no null safety
  * 
@@ -52,10 +51,8 @@ module.exports = class Sanitizer {
     /**
      * Returns the initial coordinates based on the given id
      */
-    static validateResponse() {
-        // This function should validate the response
-        // since we may have answers that are not json
-        // this function should be 
+    validateResponse() {
+        throw new Error("Method not implemented");
     };
 
     /**
@@ -69,19 +66,21 @@ module.exports = class Sanitizer {
             if(q > 14 || q < -14 || r > 14 || r < -14) {
                 return null;
             }
-
+    
             // moonshot!
             let indexedTiles = [...this._leaves, ...this._stones, ...this._trees, ...this._chests, ...this._skull, ...this._cliffs, ...this._none];
             let indexedTile = indexedTiles.find(tile => tile.q === q && tile.r === r);
             if (indexedTile) {
                 return indexedTile;
             }
-
+    
             // Maybe a dumb solution but its 24hour hackathon
-            for (let row of this._gameState.map.tiles) {
-                for (let tile of row) {
-                    if (tile.q === q && tile.r === r) {
-                        return tile;
+            if (this._gameState.map && this._gameState.map.tiles) {
+                for (let row of this._gameState.map.tiles) {
+                    for (let tile of row) {
+                        if (tile.q === q && tile.r === r) {
+                            return tile;
+                        }
                     }
                 }
             }
@@ -91,10 +90,30 @@ module.exports = class Sanitizer {
         }
     };
 
-    getValidMoves() {
-
-    };
-
+    /**
+     * 
+     * @param {*} q 
+     * @param {*} r 
+     * @returns 
+     */
+    getValidMoves(q, r) {
+        const neighbours = this.getNeighbours(q, r);
+        const validMoves = [];
+    
+        for (let neighbour of neighbours) {
+            if (neighbour.tileType === "NORMAL") {
+                validMoves.push({type: "move", tile: neighbour});
+            };
+    
+            if (neighbour.entity.type === "TREES" ||  this._players.find((player) => {
+                     player.q === neighbour.q && player.r === neighbour.r}
+            )) {
+                validMoves.push({type: "attack", tile: neighbour});
+            }
+        }
+    
+        return validMoves;
+    }
 
     /**
      * 
@@ -103,25 +122,21 @@ module.exports = class Sanitizer {
      * @returns {object[]} Array of neighbouring fields
      */
     getNeighbours(q, r) {
-        const directions = [
-            [1, 0], [-1, 0], [1, -1], [-1, 1], [0, 1], [0, -1]
-        ];
-
-        let neighbours = [];
-
+        const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, 1], [1, -1]];
+        const neighbours = [];
+    
         for (let direction of directions) {
-            let neighbourQ = q + direction[0];
-            let neighbourR = r + direction[1];
-
-            // Check if the neighbour is within the grid
+            const neighbourQ = q + direction[0];
+            const neighbourR = r + direction[1];
+    
             if (neighbourQ >= -14 && neighbourQ <= 14 && neighbourR >= -14 && neighbourR <= 14) {
-                let neighbour = this.getField(neighbourQ, neighbourR);
+                const neighbour = this.getField(neighbourQ, neighbourR);
                 if (neighbour) {
                     neighbours.push(neighbour);
                 }
             }
         }
-
+    
         return neighbours;
     }
 
@@ -203,6 +218,17 @@ module.exports = class Sanitizer {
     getTurnNumber() {
         try {
             return this._gameState.gameState.turn;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    getBotToken(id) {
+        if (id < 1 || id > 4) {
+            throw new Error("Invalid player id");
+        }
+        try {
+            return this._tokens[id-1];
         } catch (error) {
             console.log(error);
         }

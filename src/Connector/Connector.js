@@ -8,7 +8,9 @@ const Errors = require('../Loggers/Errors');
 /** Auth Bearer token used for api call auth */
 // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlByb3Rva29saU1BVEZtdWRyYWNhMSIsInBhc3N3b3JkIjoicVFaeWdHRkdkVyJ9.CiWg9nyohyMje1lab1NYjmt9v7lOKUaQ9h4Mx4LsQ55oxpAbntunUJiuj_HP_nbiNHo6XVp3pDaCZWY5HelaIQ'
 const token1 = process.env.BOT1_TOKEN;
-
+const token2 = process.env.BOT2_TOKEN;
+const token3 = process.env.BOT2_TOKEN;
+const token4 = process.env.BOT2_TOKEN;
 
 
 /**
@@ -40,14 +42,18 @@ module.exports = class Connector {
      * Class properties
      */
     _apiUrl;
-
+    _username;
+    _password;
+    _tokens = [];
 
     /**
      * Constructor
      * 
      */
-    constructor(_apiUrl) {
+    constructor(_apiUrl, username, password) {
         this._apiUrl = _apiUrl;
+        this._username = username;
+        this._password = password;
     };
 
 
@@ -56,6 +62,7 @@ module.exports = class Connector {
      * @method login
      * @method watchGame
      */
+
     /**
      * Logins and returns the bearer token
      * 
@@ -65,14 +72,17 @@ module.exports = class Connector {
      */
     async login(username, password) {
         console.log("Attempting a login to " + this._apiUrl + "/user/login");
-        console.log("Logging in with the credentials: ", username, password);
         try {
             const response = await axios.post(`${this._apiUrl}/user/login`, {
                 username: username,
                 password: password
             });
 
-            return response.data;
+            if (response.data.token) {
+                console.log("Login successful");
+            };
+
+            return response.data.token;
 
         } catch(err) {
             console.log(err);
@@ -80,136 +90,147 @@ module.exports = class Connector {
         }
     };
 
-
     /**
-     * Opens the given game id in the browser
-     * 
-     * NOT USED
+     * Called to get all 4 bot tokens for training purposes. Uses the login method
+     * of the Connector class under the hood
      */
-    async watchGame() {
-        Errors.throwMethodNotImplemented('watchGame')
+    async getBotTokens() {
+        for (let i = 1; i <= 4; i++) {
+            let botSpecificUsername = `${this._username}${i}`;
+            this._tokens.push(await this.login(botSpecificUsername, this._password));
+        }
+        console.log(this._tokens);
     };
     // #endregion
 
+
     // #region Production methods - methods used in competition itself
     /**
-     * @method joinGame
+     * @method createGame
      * @method doAction
+     * @method joinGame
+     * @method joinGameWithAllPlayers
      */
     /**
      * Joins the game with the given game id
      */
-    async joinGame() {
-        console.log("Attempting to join the game witt the auth token");
+    async joinGame(bearerToken) {
         try {
+            console.log("Attempting to join the game with the auth token");
             const response = await axios.get(`${this._apiUrl}/game/joinGame`, {
                 headers: {
-                    'Authentication' : `Bearer ${token1}`
-                }
+                    'Authorization' : `Bearer ${bearerToken}`
+                },
+                timeout: 15000
             });
-            return response;
+            return response.data;
         } catch (error) {
             console.log(error);
             Errors.throwMethodFailed('joinGame')
         };
     };
 
-    async doAction() {
-        
+    /**
+     * The right way of joining to the game
+     * 
+     * @returns {object[]} Joins the bots and returns the proper response in the following format:
+     * ```
+     * [
+     *  {
+     *      response_info,
+     *      data: {
+     *          playerIdx: 1,
+     *          gameState: {...}
+     *  }
+     * ...
+     * ]
+     * ```
+     */
+    async togetherJoin() {
+        const endpoints = [
+            `${this._apiUrl}/game/joinGame`,
+            `${this._apiUrl}/game/joinGame`,
+            `${this._apiUrl}/game/joinGame`,
+            `${this._apiUrl}/game/joinGame`
+        ]; 
+        const authTokens = [
+            this._tokens[0],
+            this._tokens[1],
+            this._tokens[2],
+            this._tokens[3]
+        ]; 
+        const requests = endpoints.map((endpoint, index) => {
+            return axios.get(endpoint, {
+                headers: {
+                    'Authorization': `Bearer ${authTokens[index]}`
+                }
+            });
+        });
+        try {
+            const responses = await axios.all(requests);
+            return responses; // This is an array
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+    /**
+     * Executes an action provided to it
+     */
+    async doAction(token, action, q, r) {
+        const validActions = ['move', 'attack'];
+
+        if (!validActions.includes(action)) {
+            throw new Error(`Invalid action: ${action}. Action must be either 'move' or 'attack'.`);
+        }
+
+        if (q < -14 || q > 14 || r < -14 || r > 14) {
+            throw new Error(`Invalid coordinates: ${q}, ${r}. Both q and r must be between -14 and 14.`);
+        }
+
+        try {
+            const response = await axios.post(`${this._apiUrl}/game/doAction`, {
+                action: `${action},${q},${r}`,
+            }, {
+                headers: {
+                    'Authorization' : `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            Errors.throwMethodFailed('doAction')
+        }
     };
 
     /**
+     * Creates the game using the first bot token in the list [0]
      * 
+     * Should return the initial state of the game
      */
-    async createGame() {
+    async createGame(mapName = "test1.txt") {
         try {
             const response = await axios.post(`${this._apiUrl}/game/createGame`, {
                 playerUsernames: [
-                                "ProtokoliMATFmudraca1",
-                                "ProtokoliMATFmudraca2",
-                                "ProtokoliMATFmudraca3",
-                                "ProtokoliMATFmudraca4"
+                                `${this._username}1`,
+                                `${this._username}2`,
+                                `${this._username}3`,
+                                `${this._username}4`,
                 ],
-                mapName: "test1.txt"
+                mapName: mapName
             }, {
                 headers: {
-                    'Authorization' : `Bearer ${token1}`
-                }
+                    'Authorization' : `Bearer ${this._tokens[0]}`
+                },
+                timeout: 25000
             });
+            console.log("Game created Successfully");
             return response.data;
         } catch(error) {
             console.log(error);
             Errors.throwMethodFailed('createGame')
         }
     };
-    // #endregion
-
-    // #region Training methods - methods used in training & trial and error
-    /**
-     * @method train
-     * @method doActionTrain
-     * @method createGame
-     */
-    /**
-     * Creates the train game with desired parameters
-     * 
-     * @param {string} mapName = name of the desired map, exmpl. test1.txt
-     * @param {number} playerIdx - id of the player position
-     * 
-     * NOTE = playerIdx is predefined, being [1, 4] (4 predefined positions
-     * 
-     * @returns generates the game with desired parameters and spawns test bots 
-     */
-    async train(mapName, playerIdx) {
-        try {
-            
-            const response = await axios.post(`${this._apiUrl}/game/train`, {
-                mapName: mapName,
-                playerIdx: playerIdx
-            }, {
-                headers: {
-                    'Authentication' : `Bearer ${token1}`
-                }
-            });
-
-            console.log(response.data)
-            return null
-
-        } catch (error) {
-            console.log(error);
-            Errors.throwMethodFailed('train')
-        }
-    };
-
-
-    /**
-     * Used for training game purposes
-     */
-    async doActionTrain(actionType, QCoordinate, RCoordinate) {
-        // Need a transformer function to match the parameters with one of the predefined actions
-        // i.e. MOVE, ATTACK and shove in the parameters then
-        try {
-             
-            const response = await axios.get(`${this._apiUrl}/game/actionTrain`, {
-                action : 'attack, -3, 3'
-            }, {
-                headers: {
-                    'Authentication' : `Bearer ${token1}`
-                }
-            })
-
-        } catch (error) {
-            console.log(error)
-            Errors.throwMethodFailed('doActionTrain')
-        }
-    };
-
-
-    /**
-     * Join Game
-     */
-    async joinGame() {
-        //
-    }
     // #endregion
 };

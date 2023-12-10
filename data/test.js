@@ -9,8 +9,8 @@ async function main() {
     sanitizer.indexResponseData();
     // const tile = sanitizer.getField(0, 11);
     // const tile = sanitizer.getField(14, -14);
-    const neighbours = sanitizer.getNeighbours(0, 0);
-    console.log(neighbours);
+    const validmoves = sanitizer.getValidMoves(14, 14);
+    console.log(validmoves);
 
 };
 
