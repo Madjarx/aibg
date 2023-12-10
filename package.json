@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "generate:tokens" : "./docker/init.sh",
+    "test:gameJoin" : "node mocks/gameManagement/gameJoin.test.js",
+    "start:prod" : "node src/Bot/Bot.js",
+    "start:simulation" : "echo 'simulation starting...'"
   },
   "keywords": [],
   "author": "",
