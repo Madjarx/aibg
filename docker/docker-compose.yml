@@ -1,0 +1,6 @@
+# Docker-compose file for the bot simulation
+#
+# Developer notes: This is to be used only if the admin team doesn't manage
+# to resolve the problem where there's no autonomous bots to trail & error our way to
+# a working solution
+version: '3'

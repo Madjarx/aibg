@@ -37,6 +37,7 @@ module.exports = class Sanitizer {
     _players = [];
 
 
+
     /**
      * Constructor
      * 
@@ -47,6 +48,7 @@ module.exports = class Sanitizer {
     };
 
 
+
     /**
      * Returns the initial coordinates based on the given id
      */
@@ -54,23 +56,75 @@ module.exports = class Sanitizer {
         // This function should validate the response
         // since we may have answers that are not json
         // this function should be 
+    };
+
+    /**
+     * 
+     * @param {number} q - q parameter relative to the main diagonals of the hexgrid
+     * @param {number} r - r parameter relative to the main diagonals of the hexgrid 
+     * @returns {object | null} Tile object, HAS TO RETURN SOMETHING
+     */
+    getField(q, r) {
+        try {
+            if(q > 14 || q < -14 || r > 14 || r < -14) {
+                return null;
+            }
+
+            // moonshot!
+            let indexedTiles = [...this._leaves, ...this._stones, ...this._trees, ...this._chests, ...this._skull, ...this._cliffs, ...this._none];
+            let indexedTile = indexedTiles.find(tile => tile.q === q && tile.r === r);
+            if (indexedTile) {
+                return indexedTile;
+            }
+
+            // Maybe a dumb solution but its 24hour hackathon
+            for (let row of this._gameState.map.tiles) {
+                for (let tile of row) {
+                    if (tile.q === q && tile.r === r) {
+                        return tile;
+                    }
+                }
+            }
+            return null;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    getValidMoves() {
+
+    };
+
+
+    /**
+     * 
+     * @param {number} q - q parameter relative to the main diagonals of the hexgrid
+     * @param {number} r - r parameter relative to the main diagonals of the hexgrid
+     * @returns {object[]} Array of neighbouring fields
+     */
+    getNeighbours(q, r) {
+        const directions = [
+            [1, 0], [-1, 0], [1, -1], [-1, 1], [0, 1], [0, -1]
+        ];
+
+        let neighbours = [];
+
+        for (let direction of directions) {
+            let neighbourQ = q + direction[0];
+            let neighbourR = r + direction[1];
+
+            // Check if the neighbour is within the grid
+            if (neighbourQ >= -14 && neighbourQ <= 14 && neighbourR >= -14 && neighbourR <= 14) {
+                let neighbour = this.getField(neighbourQ, neighbourR);
+                if (neighbour) {
+                    neighbours.push(neighbour);
+                }
+            }
+        }
+
+        return neighbours;
     }
 
-    
-    
-    static getField() {
-        
-    };
-    
-    static getValidMoves() {
-        
-    }
-    
-    static getNeighbourFields() {
-        // easy to implement since gameState is a list of lists
-        // We could also add some manhattan distance to the fields
-    };
-    
     /**
      * 
      * @param {number} playerIdx - index of the player [1, 4]
@@ -80,7 +134,7 @@ module.exports = class Sanitizer {
         if (playerIdx < 1 || playerIdx > 4) {
             throw new Error("Invalid player id");
         };
- 
+
         switch (playerIdx) {
             case 1:
                 return { q: -7, r: -7 };
@@ -103,8 +157,8 @@ module.exports = class Sanitizer {
      * @returns {Object} The player with the given index
      */
     getPlayer(playerIdx) {
-       const allPlayers = this.getAllPlayers();
-       const player = allPlayers.find(player => player.playerIdx === playerIdx);
+        const allPlayers = this.getAllPlayers();
+        const player = allPlayers.find(player => player.playerIdx === playerIdx);
 
         if (!player) {
             console.log(`Player with index ${playerIdx} not found. Found Dead?`);
@@ -213,6 +267,7 @@ module.exports = class Sanitizer {
     }
 
 
+    // #region Getters
     getLeaves() {
         try {
             return this._leaves;
@@ -253,8 +308,6 @@ module.exports = class Sanitizer {
         }
     }
 
-
-    
     getStones() {
         try {
             return this._stones;
@@ -278,8 +331,7 @@ module.exports = class Sanitizer {
             console.log(error);
         }
     };
-
-
+    // #endregion
 
     logIndexedData() {
         console.log('Stones: ', this._stones.length, 'tiles found. Data: \n', this._stones);
@@ -291,6 +343,4 @@ module.exports = class Sanitizer {
         console.log('None: ', this._none.length, 'tiles found. Data: \n', this._none);
         console.log('Players: ', this._players.length, 'tiles found. Data: \n', this._players);
     }
-
-
 };

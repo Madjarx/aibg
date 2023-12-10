@@ -1,11 +1,13 @@
-/** Class imports */
+/** Module imports */
+require('dotenv').config();
 const axios = require('axios');
 
-/** Module imports */
+/** Class imports */
 const Errors = require('../Loggers/Errors');
 
 /** Auth Bearer token used for api call auth */
-const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlByb3Rva29saU1BVEZtdWRyYWNhMSIsInBhc3N3b3JkIjoicVFaeWdHRkdkVyJ9.CiWg9nyohyMje1lab1NYjmt9v7lOKUaQ9h4Mx4LsQ55oxpAbntunUJiuj_HP_nbiNHo6XVp3pDaCZWY5HelaIQ'
+// const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlByb3Rva29saU1BVEZtdWRyYWNhMSIsInBhc3N3b3JkIjoicVFaeWdHRkdkVyJ9.CiWg9nyohyMje1lab1NYjmt9v7lOKUaQ9h4Mx4LsQ55oxpAbntunUJiuj_HP_nbiNHo6XVp3pDaCZWY5HelaIQ'
+const token1 = process.env.BOT1_TOKEN;
 
 
 
@@ -25,7 +27,7 @@ const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlByb3Rva29saU1BVEZtdWRyYWNh
  * @method joinGame
  * @method doAction
  * 
- *  Training methods
+ *  Training methods - wont be used due to server failure
  * @method train
  * @method doActionTrain
  * 
@@ -98,11 +100,47 @@ module.exports = class Connector {
      * Joins the game with the given game id
      */
     async joinGame() {
-        // production
+        console.log("Attempting to join the game witt the auth token");
+        try {
+            const response = await axios.get(`${this._apiUrl}/game/joinGame`, {
+                headers: {
+                    'Authentication' : `Bearer ${token1}`
+                }
+            });
+            return response;
+        } catch (error) {
+            console.log(error);
+            Errors.throwMethodFailed('joinGame')
+        };
     };
 
     async doAction() {
-        // production
+        
+    };
+
+    /**
+     * 
+     */
+    async createGame() {
+        try {
+            const response = await axios.post(`${this._apiUrl}/game/createGame`, {
+                playerUsernames: [
+                                "ProtokoliMATFmudraca1",
+                                "ProtokoliMATFmudraca2",
+                                "ProtokoliMATFmudraca3",
+                                "ProtokoliMATFmudraca4"
+                ],
+                mapName: "test1.txt"
+            }, {
+                headers: {
+                    'Authorization' : `Bearer ${token1}`
+                }
+            });
+            return response.data;
+        } catch(error) {
+            console.log(error);
+            Errors.throwMethodFailed('createGame')
+        }
     };
     // #endregion
 
@@ -130,7 +168,7 @@ module.exports = class Connector {
                 playerIdx: playerIdx
             }, {
                 headers: {
-                    'Authentication' : token
+                    'Authentication' : `Bearer ${token1}`
                 }
             });
 
@@ -140,37 +178,6 @@ module.exports = class Connector {
         } catch (error) {
             console.log(error);
             Errors.throwMethodFailed('train')
-        }
-    };
-
-
-    /**
-     * Creates the game for the training purposes
-     * 
-     * @returns Freshly created game
-     * 
-     */
-    async createGame() {
-        try {
-            const response = await axios.post(`${this._apiUrl}/game/createGame`, {
-                playerUsernames: [
-                    'ProtokolMATICfudraca1',
-                    'ProtokolMATICfudraca2',
-                    'ProtokolMATICfudraca3',
-                    'ProtokolMATICfudraca4'
-                ],
-                mapName: 'test1.txt'
-            }, {
-                headers: {
-                    'Authorization' : `Bearer ${token}`
-                }
-            });
-
-            console.log(response.data)
-            return null
-        } catch (error) {
-            console.log(error);
-            Errors.throwMethodFailed('createGame')
         }
     };
 
@@ -187,7 +194,7 @@ module.exports = class Connector {
                 action : 'attack, -3, 3'
             }, {
                 headers: {
-                    'Authentication' : token
+                    'Authentication' : `Bearer ${token1}`
                 }
             })
 
