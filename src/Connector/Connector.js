@@ -145,13 +145,18 @@ module.exports = class Connector {
 
     /**
      * Used for training game purposes
+     * 
+     * @param {string} actionType - defines the action you are attempting to take (can be "attack" or "move")
+     * 
+     * @param {number} QCoordinate - qcoord
+     * @param {number} RCoordinate - rcoord
      */
     async doActionTrain(actionType, QCoordinate, RCoordinate) {
         // Can you implement some checking and regex here
         try {
              
             const response = await axios.get(`${this._apiUrl}/game/actionTrain`, {
-                action : 'attack, -3, 3'
+                action : actionType + ', ' + QCoordinate + ', ' + RCoordinate
             }, {
                 headers: {
                     'Authentication' : token
