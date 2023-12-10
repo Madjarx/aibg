@@ -70,7 +70,10 @@ module.exports = class Connector {
      * @param {string} password - predefined in the env
      * @returns 
      */
-    async login(username, password) {
+    async login(
+        username = this._username,
+        password = this._password
+    ) {
         console.log("Attempting a login to " + this._apiUrl + "/user/login");
         try {
             const response = await axios.post(`${this._apiUrl}/user/login`, {
@@ -112,7 +115,7 @@ module.exports = class Connector {
      * @method joinGameWithAllPlayers
      */
     /**
-     * Joins the game with the given game id
+     * Joins the game with the given bearer token
      */
     async joinGame(bearerToken) {
         try {
@@ -121,7 +124,7 @@ module.exports = class Connector {
                 headers: {
                     'Authorization' : `Bearer ${bearerToken}`
                 },
-                timeout: 15000
+                timeout: 100000
             });
             return response.data;
         } catch (error) {

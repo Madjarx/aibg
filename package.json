@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/index.js",
     "generate:tokens" : "./docker/init.sh",
-    "test:gameJoin" : "node mocks/gameManagement/gameJoin.test.js"
+    "test:gameJoin" : "node mocks/gameManagement/gameJoin.test.js",
+    "start:prod" : "node src/Bot/Bot.js",
+    "start:simulation" : "echo 'simulation starting...'"
   },
   "keywords": [],
   "author": "",

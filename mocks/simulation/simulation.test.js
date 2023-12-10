@@ -35,11 +35,12 @@ async function main() {
     // call any sanitizer and figure out who is the first mover
     // store the order of movement to an array
 
-
-    for (let i = 1; i <= 5000; i++) {
-        // in this for loop, see whos turn it is to move, taking into account that the first mover
-        // is the player with playerIdx equal to 1
-
+    let i = 0;
+    while(i <= 5000) {
+        i++;
+        
+        // play order depends on the lower playeridx
+        // playeridx goes from [1, 4]
         // before the turn begins, always index the data => its already indexed but make sure to 
         // within connector, get the bot's location
         // get the bot token
@@ -47,6 +48,7 @@ async function main() {
         // choose a random move that is valid
         // make the move
     }
+        
 
     console.log(togetherJoinResponse.length);
 };
