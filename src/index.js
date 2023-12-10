@@ -10,16 +10,17 @@ const port = process.env.AIBG_PORT;
 const username = process.env.AIBG_USERNAME;
 const password = process.env.AIBG_PASSWORD;
 
+const url = `${apiUrl}:${port}`;
 
 
 /**
  * Main function definition
  */
 async function main() {
-    const url = `${apiUrl}:${port}`;
     const connector = new Connector(url);
-    const token = await connector.login(username, password);
-    console.log(token);
+    // const response = await connector.login(username, password);
+    const response = await connector.createGame();
+    console.log(response);
 };
 
 

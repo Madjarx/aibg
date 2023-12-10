@@ -19,7 +19,10 @@
 - valid move checker
 - training & production envs
 - implementiraj watch game skripte 
-- 
+- Pretvori ovaj projekat u nesto slicno hardhat taskovima te da mozemo svoje recepte i strategije da pravimo
+- Winston logger
+- Add predefined objects/methods  as "actions" for the Connector class, as in { "move" }
+- Needs to be faut tolerant, there wont always be 4 players in the game
 
 ### Terminologija 
 

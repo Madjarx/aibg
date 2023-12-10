@@ -2,11 +2,10 @@
 const axios = require('axios');
 
 /** Module imports */
-// const ErrorLogger = require('../ErrorLogger')
 const Errors = require('../Loggers/Errors');
 
 /** Auth Bearer token used for api call auth */
-const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlByb3Rva29saU1BVEZtdWRyYWNhIiwicGFzc3dvcmQiOiJxUVp5Z0dGR2RXIn0.taYkSor4_DPd-yEonJaLyE8A5D7MTvrWKS0o-guoVpTw5MQMZupzA_wzEpfwz8uzVrQ9_6Tx3yVJXWxIlSJ7hQ'
+const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlByb3Rva29saU1BVEZtdWRyYWNhMSIsInBhc3N3b3JkIjoicVFaeWdHRkdkVyJ9.CiWg9nyohyMje1lab1NYjmt9v7lOKUaQ9h4Mx4LsQ55oxpAbntunUJiuj_HP_nbiNHo6XVp3pDaCZWY5HelaIQ'
 
 
 
@@ -52,6 +51,10 @@ module.exports = class Connector {
 
     // #region Misc methods - methods used regardless
     /**
+     * @method login
+     * @method watchGame
+     */
+    /**
      * Logins and returns the bearer token
      * 
      * @param {string} username - predefined in the env 
@@ -87,17 +90,9 @@ module.exports = class Connector {
 
     // #region Production methods - methods used in competition itself
     /**
-     * Should create Game
-     * 
-     * Possibly used by admins
-     * 
+     * @method joinGame
+     * @method doAction
      */
-    async createGame() {
-        console.log("Possibly to be used by game admins only")
-        Errors.throwMethodNotImplemented('createGame')
-    };
-
-    
     /**
      * Joins the game with the given game id
      */
@@ -111,6 +106,11 @@ module.exports = class Connector {
     // #endregion
 
     // #region Training methods - methods used in training & trial and error
+    /**
+     * @method train
+     * @method doActionTrain
+     * @method createGame
+     */
     /**
      * Creates the train game with desired parameters
      * 
@@ -144,10 +144,42 @@ module.exports = class Connector {
 
 
     /**
+     * Creates the game for the training purposes
+     * 
+     * @returns Freshly created game
+     * 
+     */
+    async createGame() {
+        try {
+            const response = await axios.post(`${this._apiUrl}/game/createGame`, {
+                playerUsernames: [
+                    'ProtokolMATICfudraca1',
+                    'ProtokolMATICfudraca2',
+                    'ProtokolMATICfudraca3',
+                    'ProtokolMATICfudraca4'
+                ],
+                mapName: 'test1.txt'
+            }, {
+                headers: {
+                    'Authorization' : `Bearer ${token}`
+                }
+            });
+
+            console.log(response.data)
+            return null
+        } catch (error) {
+            console.log(error);
+            // Errors.throwMethodFailed('createGame')
+        }
+    };
+
+
+    /**
      * Used for training game purposes
      */
     async doActionTrain(actionType, QCoordinate, RCoordinate) {
-        // Can you implement some checking and regex here
+        // Need a transformer function to match the parameters with one of the predefined actions
+        // i.e. MOVE, ATTACK and shove in the parameters then
         try {
              
             const response = await axios.get(`${this._apiUrl}/game/actionTrain`, {
@@ -163,5 +195,13 @@ module.exports = class Connector {
             Errors.throwMethodFailed('doActionTrain')
         }
     };
+
+
+    /**
+     * Join Game
+     */
+    async joinGame() {
+        //
+    }
     // #endregion
-}
+};
